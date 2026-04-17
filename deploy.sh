@@ -1,17 +1,16 @@
 #!/bin/bash
 # =============================================
 # Mac 开发一键部署脚本 - rsync 推送
+# 授权：chmod +x deploy.sh
 # 使用方法：在项目目录下执行 ./deploy.sh
 # =============================================
 
 echo "🚀 开始同步到远程服务器..."
 
 rsync -avzP --delete \
-  --exclude='.git/' \
   --exclude='node_modules/' \
   --exclude='dist/' \
   --exclude='*.log' \
-  --exclude='.env*' \
   --exclude='__pycache__/' \
   ./ \
   dockerjvx@64.90.15.32:/work/front/misskey
