@@ -60,6 +60,9 @@ api-docs.json
 *.code-workspace
 .DS_Store
 /files
+/certbot-www
+/letsencrypt
+/docker/nginx/runtime
 ormconfig.json
 temp
 /packages/frontend/src/**/*.stories.ts

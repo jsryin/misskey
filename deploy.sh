@@ -1,7 +1,8 @@
 #!/bin/bash
 # =============================================
 # Mac 开发一键部署脚本 - rsync 推送
-# 授权：chmod +x deploy.sh
+# 服务器目录授权： chown -R dockerjvx:dockerjvx /work
+# 脚本授权：chmod +x deploy.sh
 # 使用方法：在项目目录下执行 ./deploy.sh
 # =============================================
 
