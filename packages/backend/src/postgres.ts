@@ -259,7 +259,32 @@ export const entities = [
 
 const log = process.env.NODE_ENV !== 'production';
 
+function normalizeDbExtra(extra: Config['db']['extra']) {
+	if (!extra) {
+		return {
+			statement_timeout: 1000 * 10,
+		};
+	}
+
+	const normalized = {
+		statement_timeout: 1000 * 10,
+		...extra,
+	} as Record<string, unknown>;
+
+	if (normalized.sslmode === 'require' && normalized.ssl == null) {
+		normalized.ssl = true;
+	}
+
+	if (normalized.channel_binding === 'require' && normalized.enableChannelBinding == null) {
+		normalized.enableChannelBinding = true;
+	}
+
+	return normalized;
+}
+
 export function createPostgresDataSource(config: Config) {
+	const dbExtra = normalizeDbExtra(config.db.extra);
+
 	return new DataSource({
 		type: 'postgres',
 		host: config.db.host,
@@ -267,10 +292,7 @@ export function createPostgresDataSource(config: Config) {
 		username: config.db.user,
 		password: config.db.pass,
 		database: config.db.db,
-		extra: {
-			statement_timeout: 1000 * 10,
-			...config.db.extra,
-		},
+		extra: dbExtra,
 		...(config.dbReplications ? {
 			replication: {
 				master: {
@@ -279,6 +301,7 @@ export function createPostgresDataSource(config: Config) {
 					username: config.db.user,
 					password: config.db.pass,
 					database: config.db.db,
+					extra: dbExtra,
 				},
 				slaves: config.dbSlaves!.map(rep => ({
 					host: rep.host,
@@ -286,6 +309,7 @@ export function createPostgresDataSource(config: Config) {
 					username: rep.user,
 					password: rep.pass,
 					database: rep.db,
+					extra: dbExtra,
 				})),
 			},
 		} : {}),

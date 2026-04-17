@@ -171,8 +171,9 @@ db:
   #disableCache: true
 
   # Extra Connection options
-  #extra:
-  #  ssl: true
+  extra:
+    sslmode: require
+    channel_binding: require
 
 dbReplications: false
 
@@ -196,7 +197,7 @@ dbReplications: false
 
 redis:
   host: localhost
-  port: 6379
+  port: 6313
   #family: 0  # 0=Both, 4=IPv4, 6=IPv6
   #pass: example-pass
   #prefix: example-prefix
@@ -206,7 +207,7 @@ redis:
 
 #redisForPubsub:
 #  host: localhost
-#  port: 6379
+#  port: 6313
 #  #family: 0  # 0=Both, 4=IPv4, 6=IPv6
 #  #pass: example-pass
 #  #prefix: example-prefix
@@ -216,7 +217,7 @@ redis:
 
 #redisForJobQueue:
 #  host: localhost
-#  port: 6379
+#  port: 6313
 #  #family: 0  # 0=Both, 4=IPv4, 6=IPv6
 #  #pass: example-pass
 #  #prefix: example-prefix
@@ -226,7 +227,7 @@ redis:
 
 #redisForTimelines:
 #  host: localhost
-#  port: 6379
+#  port: 6313
 #  #family: 0  # 0=Both, 4=IPv4, 6=IPv6
 #  #pass: example-pass
 #  #prefix: example-prefix
@@ -236,7 +237,7 @@ redis:
 
 #redisForReactions:
 #  host: localhost
-#  port: 6379
+#  port: 6313
 #  #family: 0  # 0=Both, 4=IPv4, 6=IPv6
 #  #pass: example-pass
 #  #prefix: example-prefix

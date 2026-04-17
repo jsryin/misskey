@@ -20,6 +20,8 @@ type RedisOptionsSource = Partial<RedisOptions> & {
 	prefix?: string;
 };
 
+type DbExtra = Record<string, unknown>;
+
 /**
  * 設定ファイルの型
  */
@@ -38,7 +40,7 @@ type Source = {
 		user?: string;
 		pass?: string;
 		disableCache?: boolean;
-		extra?: { [x: string]: string };
+		extra?: DbExtra;
 	};
 	dbReplications?: boolean;
 	dbSlaves?: {
@@ -131,7 +133,7 @@ export type Config = {
 		user: string;
 		pass: string;
 		disableCache?: boolean;
-		extra?: { [x: string]: string };
+		extra?: DbExtra;
 	};
 	dbReplications: boolean | undefined;
 	dbSlaves: {
