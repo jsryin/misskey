@@ -4,12 +4,13 @@ services:
   redis:
     restart: always
     image: redis:7-alpine
+    command: ["redis-server", "--port", "6313", "--appendonly", "yes"]
     ports:
-      - "6379:6379"
+      - "6313:6313"
     volumes:
       - ./redis:/data
     healthcheck:
-      test: "redis-cli ping"
+      test: "redis-cli -p 6313 ping"
       interval: 5s
       retries: 20
 
@@ -37,4 +38,3 @@ services:
 #      - .config/meilisearch.env
 #    volumes:
 #      - ./meili_data:/meili_data
-
