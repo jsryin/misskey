@@ -5445,6 +5445,46 @@ export interface Locale extends ILocale {
      */
     "directMessage_short": string;
     /**
+     * チェックインカレンダー
+     */
+    "checkInCalendar": string;
+    /**
+     * 今日チェックイン済み
+     */
+    "checkedInToday": string;
+    /**
+     * 今日未チェックイン
+     */
+    "notCheckedInToday": string;
+    /**
+     * 連続チェックイン
+     */
+    "checkInCurrentStreak": string;
+    /**
+     * 累計チェックイン
+     */
+    "checkInTotal": string;
+    /**
+     * チェックインする
+     */
+    "checkInNow": string;
+    /**
+     * チェックイン中...
+     */
+    "checkInSubmitting": string;
+    /**
+     * チェックインしました
+     */
+    "checkInSuccess": string;
+    /**
+     * 今日はすでにチェックイン済みです
+     */
+    "checkInAlreadyDone": string;
+    /**
+     * {n}日
+     */
+    "daysX": string;
+    /**
      * 旧設定情報を移行
      */
     "migrateOldSettings": string;

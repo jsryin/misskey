@@ -5,45 +5,73 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div :class="[$style.root, { _panel: !widgetProps.transparent }]" data-cy-mkw-calendar>
-	<div :class="[$style.calendar, { [$style.isHoliday]: isHoliday }]">
-		<p :class="$style.monthAndYear">
-			<span :class="$style.year">{{ i18n.tsx.yearX({ year }) }}</span>
-			<span :class="$style.month">{{ i18n.tsx.monthX({ month }) }}</span>
-		</p>
-		<p v-if="month === 1 && day === 1" class="day">🎉{{ i18n.tsx.dayX({ day }) }}<span style="display: inline-block; transform: scaleX(-1);">🎉</span></p>
-		<p v-else :class="$style.day">{{ i18n.tsx.dayX({ day }) }}</p>
-		<p :class="$style.weekDay">{{ weekDay }}</p>
+	<div :class="$style.head">
+		<div :class="[$style.calendar, { [$style.isHoliday]: isHoliday }]">
+			<p :class="$style.monthAndYear">
+				<span :class="$style.year">{{ i18n.tsx.yearX({ year }) }}</span>
+				<span :class="$style.month">{{ i18n.tsx.monthX({ month }) }}</span>
+			</p>
+			<p v-if="month === 1 && day === 1" class="day">🎉{{ i18n.tsx.dayX({ day }) }}<span style="display: inline-block; transform: scaleX(-1);">🎉</span></p>
+			<p v-else :class="$style.day">{{ i18n.tsx.dayX({ day }) }}</p>
+			<p :class="$style.weekDay">{{ weekDay }}</p>
+		</div>
+		<div :class="$style.info">
+			<div :class="$style.infoSection">
+				<p :class="$style.infoText">{{ i18n.ts.today }}<b :class="$style.percentage">{{ dayP.toFixed(1) }}%</b></p>
+				<div :class="$style.meter">
+					<div :class="$style.meterVal" :style="{ width: `${dayP}%` }"></div>
+				</div>
+			</div>
+			<div :class="$style.infoSection">
+				<p :class="$style.infoText">{{ i18n.ts.thisMonth }}<b :class="$style.percentage">{{ monthP.toFixed(1) }}%</b></p>
+				<div :class="$style.meter">
+					<div :class="$style.meterVal" :style="{ width: `${monthP}%` }"></div>
+				</div>
+			</div>
+			<div :class="$style.infoSection">
+				<p :class="$style.infoText">{{ i18n.ts.thisYear }}<b :class="$style.percentage">{{ yearP.toFixed(1) }}%</b></p>
+				<div :class="$style.meter">
+					<div :class="$style.meterVal" :style="{ width: `${yearP}%` }"></div>
+				</div>
+			</div>
+		</div>
 	</div>
-	<div :class="$style.info">
-		<div :class="$style.infoSection">
-			<p :class="$style.infoText">{{ i18n.ts.today }}<b :class="$style.percentage">{{ dayP.toFixed(1) }}%</b></p>
-			<div :class="$style.meter">
-				<div :class="$style.meterVal" :style="{ width: `${dayP}%` }"></div>
+	<div :class="$style.checkInPanel">
+		<div :class="$style.checkInStats">
+			<div :class="$style.statCard">
+				<span :class="$style.statLabel">{{ i18n.ts.checkInCurrentStreak }}</span>
+				<b :class="$style.statValue">{{ i18n.tsx.daysX({ n: checkInStatus?.currentStreak ?? 0 }) }}</b>
+			</div>
+			<div :class="$style.statCard">
+				<span :class="$style.statLabel">{{ i18n.ts.checkInTotal }}</span>
+				<b :class="$style.statValue">{{ i18n.tsx.daysX({ n: checkInStatus?.totalCheckIns ?? 0 }) }}</b>
 			</div>
 		</div>
-		<div :class="$style.infoSection">
-			<p :class="$style.infoText">{{ i18n.ts.thisMonth }}<b :class="$style.percentage">{{ monthP.toFixed(1) }}%</b></p>
-			<div :class="$style.meter">
-				<div :class="$style.meterVal" :style="{ width: `${monthP}%` }"></div>
-			</div>
-		</div>
-		<div :class="$style.infoSection">
-			<p :class="$style.infoText">{{ i18n.ts.thisYear }}<b :class="$style.percentage">{{ yearP.toFixed(1) }}%</b></p>
-			<div :class="$style.meter">
-				<div :class="$style.meterVal" :style="{ width: `${yearP}%` }"></div>
-			</div>
-		</div>
+		<button
+			:class="[$style.checkInButton, { [$style.isCheckedIn]: checkInStatus?.isCheckedInToday }]"
+			class="_button"
+			:disabled="checkInSubmitting"
+			@click="handleCheckIn"
+		>
+			<i :class="checkInStatus?.isCheckedInToday ? 'ti ti-rosette-discount-check' : 'ti ti-calendar-check'"></i>
+			<span>{{ checkInStatus?.isCheckedInToday ? i18n.ts.checkedInToday : checkInSubmitting ? i18n.ts.checkInSubmitting : i18n.ts.checkInNow }}</span>
+		</button>
 	</div>
 </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { defineAsyncComponent, ref, watch } from 'vue';
 import { useWidgetPropsManager } from './widget.js';
 import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from './widget.js';
 import type { FormWithDefault, GetFormResultType } from '@/utility/form.js';
+import * as os from '@/os.js';
+import { $i } from '@/i.js';
 import { i18n } from '@/i18n.js';
 import { useLowresTime, TIME_UPDATE_INTERVAL } from '@/composables/use-lowres-time.js';
+import { pleaseLogin } from '@/utility/please-login.js';
+import type { CheckInCalendar, CheckInStatus } from '@/utility/check-in.js';
+import { fetchCheckInCalendar, fetchCheckInStatus, getCurrentCheckInMonth, submitCheckIn } from '@/utility/check-in.js';
 
 const name = 'calendar';
 
@@ -75,6 +103,9 @@ const yearP = ref(0);
 const monthP = ref(0);
 const dayP = ref(0);
 const isHoliday = ref(false);
+const checkInStatus = ref<CheckInStatus | null>(null);
+const checkInCalendar = ref<CheckInCalendar | null>(null);
+const checkInSubmitting = ref(false);
 
 const nextDay = new Date();
 nextDay.setHours(24, 0, 0, 0);
@@ -136,6 +167,63 @@ watch(day, () => {
 	nextDayMidnightTime = nextDay.getTime();
 });
 
+async function refreshCheckIn() {
+	const monthInfo = getCurrentCheckInMonth();
+	const [status, calendar] = await Promise.all([
+		fetchCheckInStatus(),
+		fetchCheckInCalendar(monthInfo.year, monthInfo.month),
+	]);
+
+	checkInStatus.value = status;
+	checkInCalendar.value = calendar;
+}
+
+async function openCalendarDialog() {
+	if (checkInStatus.value == null || checkInCalendar.value == null) {
+		await refreshCheckIn();
+	}
+
+	if (checkInStatus.value == null || checkInCalendar.value == null) return;
+
+	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkCheckInCalendarDialog.vue')), {
+		year: checkInCalendar.value.year,
+		month: checkInCalendar.value.month,
+		checkInDateUtc8: checkInCalendar.value.checkInDateUtc8,
+		currentStreak: checkInStatus.value.currentStreak,
+		totalCheckIns: checkInStatus.value.totalCheckIns,
+		isCheckedInToday: checkInStatus.value.isCheckedInToday,
+		serverDate: checkInStatus.value.serverDate,
+	}, {
+		closed: () => dispose(),
+	});
+}
+
+async function handleCheckIn() {
+	if (checkInSubmitting.value) return;
+
+	if ($i == null) {
+		const isLoggedIn = await pleaseLogin();
+		if (!isLoggedIn) return;
+	}
+
+	checkInSubmitting.value = true;
+	const wasCheckedIn = checkInStatus.value?.isCheckedInToday ?? false;
+
+	try {
+		checkInStatus.value = await submitCheckIn();
+
+		const monthInfo = getCurrentCheckInMonth();
+		checkInCalendar.value = await fetchCheckInCalendar(monthInfo.year, monthInfo.month);
+
+		os.toast(wasCheckedIn ? i18n.ts.checkInAlreadyDone : i18n.ts.checkInSuccess);
+		await openCalendarDialog();
+	} finally {
+		checkInSubmitting.value = false;
+	}
+}
+
+void refreshCheckIn();
+
 defineExpose<WidgetComponentExpose>({
 	name,
 	configure,
@@ -145,19 +233,23 @@ defineExpose<WidgetComponentExpose>({
 
 <style lang="scss" module>
 .root {
-	padding: 16px 0;
+	padding: 16px;
+}
 
-	&::after {
-		content: "";
-		display: block;
-		clear: both;
+.head {
+	display: grid;
+	grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+	gap: 8px;
+	align-items: center;
+
+	@media (max-width: 500px) {
+		grid-template-columns: 1fr;
 	}
 }
 
 .calendar {
-	float: left;
-	width: 60%;
 	text-align: center;
+	padding: 10px 8px;
 
 	&.isHoliday {
 		> .day {
@@ -185,10 +277,7 @@ defineExpose<WidgetComponentExpose>({
 }
 
 .info {
-	display: block;
-	float: left;
-	width: 40%;
-	padding: 0 16px 0 0;
+	padding: 6px 0 6px 12px;
 	box-sizing: border-box;
 }
 
@@ -233,12 +322,72 @@ defineExpose<WidgetComponentExpose>({
 .meter {
 	width: 100%;
 	overflow: hidden;
-	background: light-dark(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3));
+	background: color(from var(--MI_THEME-fg) srgb r g b / 0.08);
 	border-radius: 8px;
 }
 
 .meterVal {
 	height: 4px;
 	transition: width .3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.checkInPanel {
+	margin-top: 14px;
+	padding: 16px;
+	background: color(from var(--MI_THEME-panel) srgb r g b / 0.92);
+	border-radius: 18px;
+}
+
+.checkInStats {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 10px;
+
+	@media (max-width: 500px) {
+		grid-template-columns: 1fr;
+	}
+}
+
+.statCard {
+	padding: 12px;
+	border-radius: 14px;
+	background: color(from var(--MI_THEME-bg) srgb r g b / 0.65);
+}
+
+.statLabel {
+	display: block;
+	margin-bottom: 8px;
+	font-size: 0.75rem;
+	opacity: 0.7;
+}
+
+.statValue {
+	font-size: 0.98rem;
+}
+
+.checkInButton {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	width: 100%;
+	margin-top: 14px;
+	padding: 12px 14px;
+	border-radius: 14px;
+	font-weight: 700;
+	color: #fff;
+	background: linear-gradient(135deg, var(--MI_THEME-accent), color(from var(--MI_THEME-accent) srgb calc(r * 0.8) calc(g * 0.8) calc(b * 0.8)));
+	box-shadow: 0 10px 24px color(from var(--MI_THEME-accent) srgb r g b / 0.28);
+
+	&.isCheckedIn {
+		color: var(--MI_THEME-accent);
+		background: color(from var(--MI_THEME-accent) srgb r g b / 0.13);
+		box-shadow: none;
+	}
+
+	&:disabled {
+		opacity: 0.8;
+		cursor: default;
+	}
 }
 </style>
