@@ -83,6 +83,7 @@ services:
     command: ["redis-server", "--port", "6313", "--appendonly", "yes"]
     networks:
       - internal_network
+      - external_network
     ports:
       - "6313:6313"
     volumes:
