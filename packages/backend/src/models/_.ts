@@ -23,12 +23,13 @@ import { MiBubbleGameRecord } from '@/models/BubbleGameRecord.js';
 import { MiChannel } from '@/models/Channel.js';
 import { MiChannelFavorite } from '@/models/ChannelFavorite.js';
 import { MiChannelFollowing } from '@/models/ChannelFollowing.js';
-import { MiChannelMuting } from "@/models/ChannelMuting.js";
+import { MiChannelMuting } from '@/models/ChannelMuting.js';
 import { MiChatApproval } from '@/models/ChatApproval.js';
 import { MiChatMessage } from '@/models/ChatMessage.js';
 import { MiChatRoom } from '@/models/ChatRoom.js';
 import { MiChatRoomInvitation } from '@/models/ChatRoomInvitation.js';
 import { MiChatRoomMembership } from '@/models/ChatRoomMembership.js';
+import { MiCheckInRecord } from '@/models/CheckInRecord.js';
 import { MiClip } from '@/models/Clip.js';
 import { MiClipFavorite } from '@/models/ClipFavorite.js';
 import { MiClipNote } from '@/models/ClipNote.js';
@@ -82,6 +83,7 @@ import { MiUserNotePining } from '@/models/UserNotePining.js';
 import { MiUserPending } from '@/models/UserPending.js';
 import { MiUserProfile } from '@/models/UserProfile.js';
 import { MiUserPublickey } from '@/models/UserPublickey.js';
+import { MiUserCheckInSummary } from '@/models/UserCheckInSummary.js';
 import { MiUserSecurityKey } from '@/models/UserSecurityKey.js';
 import { MiWebhook } from '@/models/Webhook.js';
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity.js';
@@ -111,6 +113,7 @@ export {
 	MiChannelFollowing,
 	MiChannelFavorite,
 	MiChannelMuting,
+	MiCheckInRecord,
 	MiClip,
 	MiClipNote,
 	MiClipFavorite,
@@ -156,6 +159,7 @@ export {
 	MiUserPending,
 	MiUserProfile,
 	MiUserPublickey,
+	MiUserCheckInSummary,
 	MiUserSecurityKey,
 	MiWebhook,
 	MiSystemWebhook,
@@ -191,6 +195,7 @@ export type BlockingsRepository = Repository<MiBlocking> & MiRepository<MiBlocki
 export type ChannelFollowingsRepository = Repository<MiChannelFollowing> & MiRepository<MiChannelFollowing>;
 export type ChannelFavoritesRepository = Repository<MiChannelFavorite> & MiRepository<MiChannelFavorite>;
 export type ChannelMutingRepository = Repository<MiChannelMuting> & MiRepository<MiChannelMuting>;
+export type CheckInRecordsRepository = Repository<MiCheckInRecord> & MiRepository<MiCheckInRecord>;
 export type ClipsRepository = Repository<MiClip> & MiRepository<MiClip>;
 export type ClipNotesRepository = Repository<MiClipNote> & MiRepository<MiClipNote>;
 export type ClipFavoritesRepository = Repository<MiClipFavorite> & MiRepository<MiClipFavorite>;
@@ -236,6 +241,7 @@ export type UserNotePiningsRepository = Repository<MiUserNotePining> & MiReposit
 export type UserPendingsRepository = Repository<MiUserPending> & MiRepository<MiUserPending>;
 export type UserProfilesRepository = Repository<MiUserProfile> & MiRepository<MiUserProfile>;
 export type UserPublickeysRepository = Repository<MiUserPublickey> & MiRepository<MiUserPublickey>;
+export type UserCheckInSummariesRepository = Repository<MiUserCheckInSummary> & MiRepository<MiUserCheckInSummary>;
 export type UserSecurityKeysRepository = Repository<MiUserSecurityKey> & MiRepository<MiUserSecurityKey>;
 export type WebhooksRepository = Repository<MiWebhook> & MiRepository<MiWebhook>;
 export type SystemWebhooksRepository = Repository<MiSystemWebhook> & MiRepository<MiWebhook>;

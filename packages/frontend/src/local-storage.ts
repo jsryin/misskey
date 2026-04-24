@@ -34,7 +34,6 @@ export type Keys = (
 	'latestPreferencesUpdate' |
 	'hidePreferencesRestoreSuggestion' |
 	'isSafeMode' |
-	'checkInRecords' |
 	`miux:${string}` |
 	`ui:folder:${string}` |
 	`themes:${string}` | // DEPRECATED

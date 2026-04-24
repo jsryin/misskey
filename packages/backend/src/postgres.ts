@@ -25,6 +25,7 @@ import { MiBlocking } from '@/models/Blocking.js';
 import { MiChannelFollowing } from '@/models/ChannelFollowing.js';
 import { MiChannelFavorite } from '@/models/ChannelFavorite.js';
 import { MiChannelMuting } from '@/models/ChannelMuting.js';
+import { MiCheckInRecord } from '@/models/CheckInRecord.js';
 import { MiClip } from '@/models/Clip.js';
 import { MiClipNote } from '@/models/ClipNote.js';
 import { MiClipFavorite } from '@/models/ClipFavorite.js';
@@ -67,6 +68,7 @@ import { MiUserListFavorite } from '@/models/UserListFavorite.js';
 import { MiUserListMembership } from '@/models/UserListMembership.js';
 import { MiUserNotePining } from '@/models/UserNotePining.js';
 import { MiUserPending } from '@/models/UserPending.js';
+import { MiUserCheckInSummary } from '@/models/UserCheckInSummary.js';
 import { MiUserProfile } from '@/models/UserProfile.js';
 import { MiUserPublickey } from '@/models/UserPublickey.js';
 import { MiUserSecurityKey } from '@/models/UserSecurityKey.js';
@@ -222,6 +224,8 @@ export const entities = [
 	MiAbuseReportNotificationRecipient,
 	MiRegistrationTicket,
 	MiSignin,
+	MiCheckInRecord,
+	MiUserCheckInSummary,
 	MiModerationLog,
 	MiClip,
 	MiClipNote,

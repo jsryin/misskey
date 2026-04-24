@@ -22,6 +22,7 @@ import {
 	MiChannelFavorite,
 	MiChannelFollowing,
 	MiChannelMuting,
+	MiCheckInRecord,
 	MiClip,
 	MiClipFavorite,
 	MiClipNote,
@@ -77,6 +78,7 @@ import {
 	MiUserPending,
 	MiUserProfile,
 	MiUserPublickey,
+	MiUserCheckInSummary,
 	MiUserSecurityKey,
 	MiWebhook,
 	MiChatMessage,
@@ -340,6 +342,18 @@ const $signinsRepository: Provider = {
 	inject: [DI.db],
 };
 
+const $checkInRecordsRepository: Provider = {
+	provide: DI.checkInRecordsRepository,
+	useFactory: (db: DataSource) => db.getRepository(MiCheckInRecord).extend(miRepository as MiRepository<MiCheckInRecord>),
+	inject: [DI.db],
+};
+
+const $userCheckInSummariesRepository: Provider = {
+	provide: DI.userCheckInSummariesRepository,
+	useFactory: (db: DataSource) => db.getRepository(MiUserCheckInSummary).extend(miRepository as MiRepository<MiUserCheckInSummary>),
+	inject: [DI.db],
+};
+
 const $pagesRepository: Provider = {
 	provide: DI.pagesRepository,
 	useFactory: (db: DataSource) => db.getRepository(MiPage).extend(miRepository as MiRepository<MiPage>),
@@ -589,6 +603,8 @@ const $reversiGamesRepository: Provider = {
 		$authSessionsRepository,
 		$accessTokensRepository,
 		$signinsRepository,
+		$checkInRecordsRepository,
+		$userCheckInSummariesRepository,
 		$pagesRepository,
 		$pageLikesRepository,
 		$galleryPostsRepository,
@@ -667,6 +683,8 @@ const $reversiGamesRepository: Provider = {
 		$authSessionsRepository,
 		$accessTokensRepository,
 		$signinsRepository,
+		$checkInRecordsRepository,
+		$userCheckInSummariesRepository,
 		$pagesRepository,
 		$pageLikesRepository,
 		$galleryPostsRepository,

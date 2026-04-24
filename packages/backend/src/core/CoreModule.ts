@@ -15,6 +15,7 @@ import { SystemWebhookService } from '@/core/SystemWebhookService.js';
 import { UserSearchService } from '@/core/UserSearchService.js';
 import { WebhookTestService } from '@/core/WebhookTestService.js';
 import { FlashService } from '@/core/FlashService.js';
+import { CheckInService } from '@/core/CheckInService.js';
 import { ChannelMutingService } from '@/core/ChannelMutingService.js';
 import { AccountMoveService } from './AccountMoveService.js';
 import { AccountUpdateService } from './AccountUpdateService.js';
@@ -218,6 +219,7 @@ const $WebhookTestService: Provider = { provide: 'WebhookTestService', useExisti
 const $UtilityService: Provider = { provide: 'UtilityService', useExisting: UtilityService };
 const $FileInfoService: Provider = { provide: 'FileInfoService', useExisting: FileInfoService };
 const $FlashService: Provider = { provide: 'FlashService', useExisting: FlashService };
+const $CheckInService: Provider = { provide: 'CheckInService', useExisting: CheckInService };
 const $SearchService: Provider = { provide: 'SearchService', useExisting: SearchService };
 const $ClipService: Provider = { provide: 'ClipService', useExisting: ClipService };
 const $FeaturedService: Provider = { provide: 'FeaturedService', useExisting: FeaturedService };
@@ -352,6 +354,7 @@ const $ApQuestionService: Provider = { provide: 'ApQuestionService', useExisting
 		RoleService,
 		S3Service,
 		SignupService,
+		CheckInService,
 		WebAuthnService,
 		UserBlockingService,
 		CacheService,
@@ -502,6 +505,7 @@ const $ApQuestionService: Provider = { provide: 'ApQuestionService', useExisting
 		$RoleService,
 		$S3Service,
 		$SignupService,
+		$CheckInService,
 		$WebAuthnService,
 		$UserBlockingService,
 		$CacheService,
@@ -652,6 +656,7 @@ const $ApQuestionService: Provider = { provide: 'ApQuestionService', useExisting
 		RoleService,
 		S3Service,
 		SignupService,
+		CheckInService,
 		WebAuthnService,
 		UserBlockingService,
 		CacheService,
