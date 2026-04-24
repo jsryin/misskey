@@ -68,7 +68,7 @@ import { i18n } from '@/i18n.js';
 const props = defineProps<{
 	year: number;
 	month: number;
-	checkInDateUtc8: string[];
+	checkedDates: string[];
 	currentStreak: number;
 	totalCheckIns: number;
 	isCheckedInToday: boolean;
@@ -82,7 +82,7 @@ const emit = defineEmits<{
 const modal = useTemplateRef('modal');
 const rootEl = useTemplateRef('rootEl');
 
-const checkedDaySet = computed(() => new Set(props.checkInDateUtc8.map(date => Number(date.split('-')[2]))));
+const checkedDaySet = computed(() => new Set(props.checkedDates.map(date => Number(date.split('-')[2]))));
 const serverDay = computed(() => {
 	const [year, month, day] = props.serverDate.split('-').map(Number);
 	return { year, month, day };

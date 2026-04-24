@@ -22,6 +22,23 @@ export function isAPIError(reason: Record<PropertyKey, unknown>): reason is APIE
 	return reason[MK_API_ERROR] === true;
 }
 
+function getClientTimeZone(): string | null {
+	try {
+		return Intl.DateTimeFormat().resolvedOptions().timeZone;
+	} catch {
+		return null;
+	}
+}
+
+function appendTimeZoneHeader(headers: Record<string, string> = {}): Record<string, string> {
+	const timeZone = getClientTimeZone();
+
+	return timeZone == null ? headers : {
+		...headers,
+		'X-Timezone': timeZone,
+	};
+}
+
 export type FetchLike = (input: string, init?: {
 	method?: string;
 	body?: Blob | FormData | string;
@@ -106,9 +123,9 @@ export class APIClient {
 			this.fetch(`${this.origin}/api/${endpoint}`, {
 				method: 'POST',
 				body: payload,
-				headers: mediaType === 'multipart/form-data' ? {} : {
+				headers: mediaType === 'multipart/form-data' ? appendTimeZoneHeader() : appendTimeZoneHeader({
 					'Content-Type': mediaType,
-				},
+				}),
 				credentials: 'omit',
 				cache: 'no-cache',
 			}).then(async (res) => {

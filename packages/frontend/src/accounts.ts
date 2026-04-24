@@ -16,6 +16,7 @@ import { prefer } from '@/preferences.js';
 import { store } from '@/store.js';
 import { $i } from '@/i.js';
 import { signout } from '@/signout.js';
+import { appendTimeZoneHeader } from '@/utility/api-timezone.js';
 
 type AccountWithToken = Misskey.entities.MeDetailed & { token: string };
 
@@ -66,9 +67,9 @@ function fetchAccount(token: string, id?: string, forceShowDialog?: boolean): Pr
 			body: JSON.stringify({
 				i: token,
 			}),
-			headers: {
+			headers: appendTimeZoneHeader({
 				'Content-Type': 'application/json',
-			},
+			}),
 		})
 			.then(res => new Promise<Misskey.entities.MeDetailed | { error: Record<string, any> }>((done2, fail2) => {
 				if (res.status >= 500 && res.status < 600) {

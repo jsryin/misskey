@@ -20,7 +20,12 @@ export const meta = {
 		properties: {
 			year: { type: 'integer', optional: false, nullable: false },
 			month: { type: 'integer', optional: false, nullable: false },
-			checkInDateUtc8: {
+			checkedAt: {
+				type: 'array',
+				optional: false, nullable: false,
+				items: { type: 'string', optional: false, nullable: false },
+			},
+			checkedDates: {
 				type: 'array',
 				optional: false, nullable: false,
 				items: { type: 'string', optional: false, nullable: false },
@@ -48,8 +53,8 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 	constructor(
 		private checkInService: CheckInService,
 	) {
-		super(meta, paramDef, async (ps, me) => {
-			return await this.checkInService.getCalendar(me.id, ps.year, ps.month);
+		super(meta, paramDef, async (ps, me, _token, _file, _cleanup, _ip, headers) => {
+			return await this.checkInService.getCalendar(me.id, ps.year, ps.month, headers?.['x-timezone']);
 		});
 	}
 }

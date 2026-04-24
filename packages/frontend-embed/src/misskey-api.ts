@@ -6,6 +6,7 @@
 import * as Misskey from 'misskey-js';
 import { ref } from 'vue';
 import { apiUrl } from '@@/js/config.js';
+import { appendTimeZoneHeader } from '@/api-timezone.js';
 
 export const pendingApiRequestsCount = ref(0);
 
@@ -34,9 +35,9 @@ export function misskeyApi<
 			body: JSON.stringify(data),
 			credentials: 'omit',
 			cache: 'no-cache',
-			headers: {
+			headers: appendTimeZoneHeader({
 				'Content-Type': 'application/json',
-			},
+			}),
 			signal,
 		}).then(async (res) => {
 			const body = res.status === 204 ? null : await res.json();
@@ -80,6 +81,7 @@ export function misskeyApiGet<
 			method: 'GET',
 			credentials: 'omit',
 			cache: 'default',
+			headers: appendTimeZoneHeader(),
 		}).then(async (res) => {
 			const body = res.status === 204 ? null : await res.json();
 

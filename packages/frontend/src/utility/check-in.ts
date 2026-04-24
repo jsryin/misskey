@@ -5,6 +5,7 @@
 
 import { apiUrl } from '@@/js/config.js';
 import { $i } from '@/i.js';
+import { appendTimeZoneHeader } from '@/utility/api-timezone.js';
 
 export type CheckInStatus = {
 	serverDate: string;
@@ -19,7 +20,7 @@ export type CheckInStatus = {
 export type CheckInCalendar = {
 	year: number;
 	month: number;
-	checkInDateUtc8: string[];
+	checkedDates: string[];
 	rewardSummary?: Record<string, unknown>;
 };
 
@@ -31,6 +32,7 @@ type CheckInStatusResponse = Partial<CheckInStatus> & {
 type CheckInCalendarResponse = {
 	year?: number;
 	month?: number;
+	checkedAt?: string[];
 	checkInDateUtc8?: string[];
 	checkedDates?: string[];
 	rewardSummary?: Record<string, unknown>;
@@ -78,9 +80,9 @@ async function request<T>(endpoint: string, data: Record<string, unknown> = {}):
 		method: 'POST',
 		credentials: 'omit',
 		cache: 'no-cache',
-		headers: {
+		headers: appendTimeZoneHeader({
 			'Content-Type': 'application/json',
-		},
+		}),
 		body: JSON.stringify({
 			...data,
 			i: $i.token,
@@ -117,7 +119,7 @@ function normalizeCalendar(response: CheckInCalendarResponse, year: number, mont
 	return {
 		year: response.year ?? year,
 		month: response.month ?? month,
-		checkInDateUtc8: (response.checkInDateUtc8 ?? response.checkedDates ?? [])
+		checkedDates: (response.checkedDates ?? response.checkedAt ?? response.checkInDateUtc8 ?? [])
 			.map(date => normalizeLocalDateString(date, fallbackPrefix)),
 		rewardSummary: response.rewardSummary,
 	};
@@ -153,7 +155,7 @@ export async function fetchCheckInCalendar(year: number, month: number) {
 		return {
 			year,
 			month,
-			checkInDateUtc8: [],
+			checkedDates: [],
 		};
 	}
 

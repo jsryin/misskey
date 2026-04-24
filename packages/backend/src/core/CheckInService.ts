@@ -25,7 +25,8 @@ export type CheckInStatus = {
 export type CheckInCalendar = {
 	year: number;
 	month: number;
-	checkInDateUtc8: string[];
+	checkedAt: string[];
+	checkedDates: string[];
 	rewardSummary: Record<string, unknown>;
 };
 
@@ -49,6 +50,8 @@ export class CheckInService {
 		private idService: IdService,
 	) {
 	}
+
+	private readonly dateTimeFormatters = new Map<string, Intl.DateTimeFormat>();
 
 	public async getStatus(userId: string, now = new Date()): Promise<CheckInStatus> {
 		const currentCheckInDateUtc8 = this.formatUtc8Date(now);
@@ -123,23 +126,32 @@ export class CheckInService {
 		};
 	}
 
-	public async getCalendar(userId: string, year: number, month: number): Promise<CheckInCalendar> {
-		const start = `${year}-${`${month}`.padStart(2, '0')}-01`;
+	public async getCalendar(userId: string, year: number, month: number, timeZone?: string | null): Promise<CheckInCalendar> {
+		const normalizedTimeZone = this.normalizeTimeZone(timeZone);
+		const start = this.zonedDateTimeToUtc(year, month, 1, normalizedTimeZone);
 		const nextMonth = month === 12 ? { year: year + 1, month: 1 } : { year, month: month + 1 };
-		const end = `${nextMonth.year}-${`${nextMonth.month}`.padStart(2, '0')}-01`;
+		const end = this.zonedDateTimeToUtc(nextMonth.year, nextMonth.month, 1, normalizedTimeZone);
 
 		const rows = await this.checkInRecordsRepository.createQueryBuilder('record')
-			.select('record.checkInDateUtc8', 'checkInDateUtc8')
+			.select('record.checkedAt', 'checkedAt')
 			.where('record.userId = :userId', { userId })
-			.andWhere('record.checkInDateUtc8 >= :start', { start })
-			.andWhere('record.checkInDateUtc8 < :end', { end })
-			.orderBy('record.checkInDateUtc8', 'ASC')
-			.getRawMany<{ checkInDateUtc8: string }>();
+			.andWhere('record.checkedAt >= :start', { start })
+			.andWhere('record.checkedAt < :end', { end })
+			.orderBy('record.checkedAt', 'ASC')
+			.getRawMany<{ checkedAt: string | Date }>();
+
+		const checkedAt = rows
+			.map(row => row.checkedAt instanceof Date ? row.checkedAt : new Date(row.checkedAt))
+			.filter(date => {
+				const parts = this.getDatePartsInTimeZone(date, normalizedTimeZone);
+				return parts.year === year && parts.month === month;
+			});
 
 		return {
 			year,
 			month,
-			checkInDateUtc8: rows.map(row => row.checkInDateUtc8),
+			checkedAt: checkedAt.map(date => date.toISOString()),
+			checkedDates: checkedAt.map(date => this.formatDateInTimeZone(date, normalizedTimeZone)),
 			rewardSummary: {},
 		};
 	}
@@ -178,5 +190,75 @@ export class CheckInService {
 		const month = `${date.getUTCMonth() + 1}`.padStart(2, '0');
 		const day = `${date.getUTCDate()}`.padStart(2, '0');
 		return `${year}-${month}-${day}`;
+	}
+
+	private normalizeTimeZone(timeZone?: string | null): string {
+		if (timeZone == null || timeZone === '') return 'UTC';
+
+		try {
+			new Intl.DateTimeFormat('en-US', { timeZone }).format();
+			return timeZone;
+		} catch {
+			return 'UTC';
+		}
+	}
+
+	private getDateTimeFormatter(timeZone: string): Intl.DateTimeFormat {
+		let formatter = this.dateTimeFormatters.get(timeZone);
+
+		if (formatter == null) {
+			formatter = new Intl.DateTimeFormat('en-CA', {
+				timeZone,
+				year: 'numeric',
+				month: '2-digit',
+				day: '2-digit',
+				hour: '2-digit',
+				minute: '2-digit',
+				second: '2-digit',
+				hourCycle: 'h23',
+			});
+			this.dateTimeFormatters.set(timeZone, formatter);
+		}
+
+		return formatter;
+	}
+
+	private getDatePartsInTimeZone(date: Date, timeZone: string): {
+		year: number;
+		month: number;
+		day: number;
+		hour: number;
+		minute: number;
+		second: number;
+	} {
+		const parts = this.getDateTimeFormatter(timeZone).formatToParts(date);
+		const getValue = (type: Intl.DateTimeFormatPartTypes) => Number(parts.find(part => part.type === type)?.value ?? '0');
+
+		return {
+			year: getValue('year'),
+			month: getValue('month'),
+			day: getValue('day'),
+			hour: getValue('hour'),
+			minute: getValue('minute'),
+			second: getValue('second'),
+		};
+	}
+
+	private formatDateInTimeZone(date: Date, timeZone: string): string {
+		const parts = this.getDatePartsInTimeZone(date, timeZone);
+		return `${parts.year}-${`${parts.month}`.padStart(2, '0')}-${`${parts.day}`.padStart(2, '0')}`;
+	}
+
+	private getTimeZoneOffsetMilliseconds(date: Date, timeZone: string): number {
+		const parts = this.getDatePartsInTimeZone(date, timeZone);
+		const utcTime = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
+		return utcTime - date.getTime();
+	}
+
+	private zonedDateTimeToUtc(year: number, month: number, day: number, timeZone: string): Date {
+		const utcGuess = Date.UTC(year, month - 1, day, 0, 0, 0);
+		const firstPass = utcGuess - this.getTimeZoneOffsetMilliseconds(new Date(utcGuess), timeZone);
+		const secondPass = utcGuess - this.getTimeZoneOffsetMilliseconds(new Date(firstPass), timeZone);
+		return new Date(secondPass);
 	}
 }

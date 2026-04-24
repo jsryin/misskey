@@ -188,7 +188,7 @@ async function openCalendarDialog() {
 	const { dispose } = os.popup(defineAsyncComponent(() => import('@/components/MkCheckInCalendarDialog.vue')), {
 		year: checkInCalendar.value.year,
 		month: checkInCalendar.value.month,
-		checkInDateUtc8: checkInCalendar.value.checkInDateUtc8,
+		checkedDates: checkInCalendar.value.checkedDates,
 		currentStreak: checkInStatus.value.currentStreak,
 		totalCheckIns: checkInStatus.value.totalCheckIns,
 		isCheckedInToday: checkInStatus.value.isCheckedInToday,
