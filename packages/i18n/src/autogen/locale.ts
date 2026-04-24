@@ -5483,7 +5483,7 @@ export interface Locale extends ILocale {
     /**
      * {n}日
      */
-    "daysX": string;
+    "daysX": ParameterizedString<"n">;
     /**
      * 旧設定情報を移行
      */

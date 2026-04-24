@@ -18,7 +18,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<MkEmoji v-else class="emoji" :emoji="emoji.emoji" :normal="true" :noStyle="true"/>
 						</span>
 					</div>
-					<button v-if="thereIsTreasure" class="_button treasure" @click="getTreasure"><img src="/fluent-emoji/1f3c6.png" class="treasureImg"></button>
+					<button v-if="thereIsTreasure" class="_button treasure" @click="getTreasure"><img :src="treasureEmojiUrl" class="treasureImg"></button>
 				</div>
 				<div style="text-align: center;">
 					{{ i18n.ts._aboutMisskey.about }}<br><a href="https://misskey-hub.net/docs/about-misskey/" target="_blank" class="_link">{{ i18n.ts.learnMore }}</a>
@@ -415,6 +415,8 @@ const patrons = [
 	'スズカケン',
 	'蒼井よみこ',
 ];
+
+const treasureEmojiUrl = '/fluent-emoji/1f3c6.png';
 
 const thereIsTreasure = ref($i && !claimedAchievements.includes('foundTreasure'));
 
