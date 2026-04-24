@@ -2,13 +2,13 @@
 
 这个仓库现在包含一套可用于生产环境的 Docker 部署方案，用于运行：
 
-- 监听内部 `3000` 端口的 Misskey
+- 监听内部 `3010` 端口的 Misskey
 - 监听 `80/443` 的 Nginx
 - 支持自动续期的 Certbot
 
 ## 架构
 
-- `web` 仅在 Docker 内部监听 `3000`
+- `web` 仅在 Docker 内部监听 `3010`
 - `nginx` 是唯一的公网入口
 - `certbot` 使用 ACME webroot 验证方式
 - 证书保存在 `./letsencrypt`
@@ -28,7 +28,7 @@
 
 ```yml
 url: https://kho.cc.cd/
-port: 3000
+port: 3010
 ```
 
 ## 首次部署

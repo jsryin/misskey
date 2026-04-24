@@ -10,7 +10,7 @@ services:
       redis:
         condition: service_healthy
     ports:
-      - "3000:3000"
+      - "3010:3010"
     networks:
       - internal_network
       - external_network
